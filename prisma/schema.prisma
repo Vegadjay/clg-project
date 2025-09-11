@@ -1,0 +1,96 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               Int          @id @default(autoincrement())
+  name             String
+  email            String       @unique
+  password         String
+  phone            String?      
+  address          String?      
+  role             Role         @default(PATRON)
+  libraryCardNumber String       @unique
+  createdAt        DateTime     @default(now())
+  transactions     Transaction[]
+  reservations     Reservation[]
+}
+
+model Book {
+  id              Int          @id @default(autoincrement())
+  title           String       @db.Text
+  author          String       @db.Text
+  isbn            String       @unique @db.VarChar(20)
+  categoryId      Int
+  category        Category     @relation(fields: [categoryId], references: [id])
+  publisher       String       @db.Text
+  publicationDate DateTime
+  totalCopies     Int
+  availableCopies Int
+  description     String? @db.Text
+  imageUrl        String? @db.Text
+  ebookUrl        String? @db.Text
+  transactions    Transaction[]
+  reservations    Reservation[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  books Book[]
+}
+
+model Transaction {
+  id          Int          @id @default(autoincrement())
+  userId      Int
+  user        User         @relation(fields: [userId], references: [id])
+  bookId      Int
+  book        Book         @relation(fields: [bookId], references: [id])
+  borrowDate  DateTime     @default(now())
+  dueDate     DateTime
+  returnDate  DateTime?
+  fineAmount  Float        @default(0)
+  status      TransactionStatus @default(ACTIVE)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Reservation {
+  id              Int          @id @default(autoincrement())
+  userId          Int
+  user            User         @relation(fields: [userId], references: [id])
+  bookId          Int
+  book            Book         @relation(fields: [bookId], references: [id])
+  reservationDate DateTime     @default(now())
+  status          ReservationStatus @default(ACTIVE)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+enum Role {
+  ADMIN
+  LIBRARIAN
+  PATRON
+}
+
+enum TransactionStatus {
+  ACTIVE
+  RETURNED
+  OVERDUE
+  LOST
+  CANCELLED
+}
+
+enum ReservationStatus {
+  ACTIVE
+  FULFILLED
+  CANCELLED
+}

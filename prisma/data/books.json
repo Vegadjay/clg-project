@@ -1,0 +1,56 @@
+{
+  "categories": [
+    "Fiction",
+    "Non-Fiction",
+    "Science",
+    "Technology",
+    "History",
+    "Biography"
+  ],
+  "books": [
+    {
+      "title": "The Pragmatic Programmer",
+      "author": "Andrew Hunt, David Thomas",
+      "isbn": "9780201616224",
+      "category": "Technology",
+      "publisher": "Addison-Wesley",
+      "publicationDate": "1999-10-30",
+      "totalCopies": 10,
+      "availableCopies": 8,
+      "description": "Classic book on software craftsmanship."
+    },
+    {
+      "title": "Sapiens: A Brief History of Humankind",
+      "author": "Yuval Noah Harari",
+      "isbn": "9780062316097",
+      "category": "History",
+      "publisher": "Harper",
+      "publicationDate": "2015-02-10",
+      "totalCopies": 12,
+      "availableCopies": 12,
+      "description": "A narrative of humanity’s creation and evolution."
+    },
+    {
+      "title": "Clean Code",
+      "author": "Robert C. Martin",
+      "isbn": "9780132350884",
+      "category": "Technology",
+      "publisher": "Prentice Hall",
+      "publicationDate": "2008-08-01",
+      "totalCopies": 7,
+      "availableCopies": 6,
+      "description": "A Handbook of Agile Software Craftsmanship."
+    },
+    {
+      "title": "A Brief History of Time",
+      "author": "Stephen Hawking",
+      "isbn": "9780553380163",
+      "category": "Science",
+      "publisher": "Bantam",
+      "publicationDate": "1998-09-01",
+      "totalCopies": 9,
+      "availableCopies": 9,
+      "description": "From the Big Bang to Black Holes."
+    }
+  ]
+}
