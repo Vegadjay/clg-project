@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Eye, Pencil, Plus } from "lucide-react";
+import { Eye, Pencil, Plus, BookOpen } from "lucide-react";
 
 interface Book {
   id: number;
@@ -68,21 +68,33 @@ const Button = ({
 export default function BooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState<number | null>(null);
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    extractRole();
+    fetchAuthStatus();
     fetchBooks();
   }, []);
 
-  function extractRole() {
-    const match = document.cookie.match(/(?:^|;\s*)role=([^;]*)/);
-    const role = match ? decodeURIComponent(match[1]) : "";
-    console.log("Match", match, "Role", role);
-    setRole(role);
-  }
+  const fetchAuthStatus = async () => {
+    try {
+      const resp = await fetch("/api/users?me=true", {
+        credentials: "include",
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setRole(data?.user?.role || null);
+        setIsAuthenticated(!!data?.user);
+      } else {
+        setRole(null);
+        setIsAuthenticated(false);
+      }
+    } catch {
+      setRole(null);
+      setIsAuthenticated(false);
+    }
+  };
 
   const fetchBooks = async () => {
     try {
@@ -99,21 +111,6 @@ export default function BooksPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDelete = async (id: number) => {
-    const shouldDelete = window.confirm(
-      "Are you sure you want to delete this book?"
-    );
-    if (!shouldDelete) return;
-    setDeleting(id);
-    const res = await fetch(`/api/books/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      setBooks(books.filter((book) => book.id !== id));
-    } else {
-      alert("Error deleting book.");
-    }
-    setDeleting(null);
   };
 
   if (loading) {
@@ -162,9 +159,9 @@ export default function BooksPage() {
           {books.map((book) => (
             <div
               key={book.id}
-              className="bg-white rounded-xl border border-zinc-200 overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col"
+              className="bg-white rounded-2xl border border-zinc-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col shadow-md hover:border-zinc-300"
             >
-              <div className="flex justify-center items-center overflow-hidden bg-zinc-100 w-full h-80">
+              <div className="flex justify-center items-center overflow-hidden bg-gradient-to-br from-zinc-50 to-zinc-100 w-full h-80 relative">
                 {book.imageUrl ? (
                   <img
                     src={book.imageUrl}
@@ -176,7 +173,7 @@ export default function BooksPage() {
                   <div className="w-full h-80 flex items-center justify-center">
                     <div className="text-center text-zinc-400">
                       <svg
-                        className="w-12 h-12 mx-auto mb-2"
+                        className="w-16 h-16 mx-auto mb-3 opacity-60"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -188,34 +185,48 @@ export default function BooksPage() {
                           d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
                         />
                       </svg>
-                      <span className="text-sm">No image</span>
+                      <span className="text-sm font-medium">
+                        No image available
+                      </span>
                     </div>
                   </div>
                 )}
+                {/* Availability overlay */}
+                <div className="absolute top-3 right-3">
+                  <div
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      book.availableCopies > 0
+                        ? "bg-green-100 text-green-800 border border-green-200"
+                        : "bg-red-100 text-red-800 border border-red-200"
+                    }`}
+                  >
+                    {book.availableCopies > 0 ? "Available" : "Unavailable"}
+                  </div>
+                </div>
               </div>
 
               {/* Book Info */}
-              <div className="p-4 flex flex-col flex-1">
-                <h3 className="font-semibold truncate text-zinc-900 mb-2 line-clamp-2 group-hover:text-zinc-700 transition-colors">
+              <div className="p-5 flex flex-col flex-1">
+                <h3 className="font-bold text-lg text-zinc-900 mb-2 line-clamp-2 group-hover:text-zinc-700 transition-colors leading-tight">
                   {book.title}
                 </h3>
 
-                <p className="text-sm text-zinc-600 mb-3">by {book.author}</p>
+                <p className="text-sm text-zinc-600 mb-3 font-medium">
+                  by {book.author}
+                </p>
 
-                {/* Availability Badge */}
+                {/* Category and Availability */}
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-zinc-500 bg-zinc-100 px-2 py-1 rounded-full font-medium">
                     {book.category?.name || "Uncategorized"}
                   </span>
-                  <div className="flex items-center space-x-1">
-                    <div
-                      className={`w-2 h-2 rounded-full ${
-                        book.availableCopies > 0 ? "bg-green-500" : "bg-red-500"
-                      }`}
-                    ></div>
-                    <span className="text-xs font-medium text-zinc-700">
-                      {book.availableCopies}/{book.totalCopies}
-                    </span>
+                  <div className="flex items-center space-x-2">
+                    <div className="text-right">
+                      <div className="text-xs text-zinc-500">Copies</div>
+                      <div className="text-sm font-semibold text-zinc-700">
+                        {book.availableCopies}/{book.totalCopies}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -225,45 +236,35 @@ export default function BooksPage() {
                     onClick={() => router.push(`/books/${book.id}`)}
                     variant="primary"
                     size="sm"
-                    className="flex-1 cursor-pointer"
+                    className="flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
                   >
-                    <Eye />
+                    <Eye className="w-4 h-4" />
+                    <span className="ml-1 hidden sm:inline">View</span>
                   </Button>
-                  <Button
-                    onClick={() => router.push(`/books/edit/${book.id}`)}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 cursor-pointer"
-                  >
-                    <Pencil />
-                  </Button>
-                  <Button
-                    onClick={() => handleDelete(book.id)}
-                    variant="destructive"
-                    size="sm"
-                    disabled={deleting === book.id}
-                    className="px-3"
-                  >
-                    {deleting === book.id ? (
-                      <div className="w-4 h-4 border-2 border-white cursor-pointer border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <div className="cursor-pointer">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </div>
+                  {isAuthenticated &&
+                    role === "PATRON" &&
+                    book.availableCopies > 0 && (
+                      <Button
+                        onClick={() => router.push(`/request-book/${book.id}`)}
+                        variant="secondary"
+                        size="sm"
+                        className="flex-1 cursor-pointer hover:shadow-md transition-all duration-200"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        <span className="ml-1 hidden sm:inline">Request</span>
+                      </Button>
                     )}
-                  </Button>
+                  {(role === "ADMIN" || role === "LIBRARIAN") && (
+                    <Button
+                      onClick={() => router.push(`/books/edit/${book.id}`)}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 cursor-pointer hover:shadow-md transition-all duration-200 border-zinc-300 hover:border-zinc-400"
+                    >
+                      <Pencil className="w-4 h-4" />
+                      <span className="ml-1 hidden sm:inline">Edit</span>
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -305,7 +306,4 @@ export default function BooksPage() {
       )}
     </div>
   );
-}
-function jwtDecode(token: string | null) {
-  throw new Error("Function not implemented.");
 }

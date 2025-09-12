@@ -55,7 +55,8 @@ export default function Login() {
         return;
       }
 
-      // Store user data in localStorage
+      window.location.reload();
+
       if (data.user) {
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("isAuthenticated", "true");

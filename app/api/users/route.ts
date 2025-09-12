@@ -42,19 +42,58 @@ export async function GET(_req: NextRequest) {
 
 export async function POST(_req: NextRequest) {
   try {
-    const action = _req.nextUrl.searchParams.get("action");
-    if (action === "logout") {
-      const res = NextResponse.json({ message: "Logged out" });
-      res.cookies.set("auth", "", {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 0,
-      });
-      return res;
-    }
-    return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+    return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
   } catch (error) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const token = req.cookies.get("auth")?.value;
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const payload = verifyJwtToken(token);
+    if (!payload || payload.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { userId, isVerified } = await req.json();
+
+    if (typeof userId !== "number" || typeof isVerified !== "boolean") {
+      return NextResponse.json(
+        { error: "Invalid request data" },
+        { status: 400 }
+      );
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { isVerified },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        address: true,
+        role: true,
+        libraryCardNumber: true,
+        isVerified: true,
+        createdAt: true,
+      },
+    });
+
+    return NextResponse.json({
+      message: `User ${isVerified ? "verified" : "unverified"} successfully`,
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Failed to update user verification:", error);
+    return NextResponse.json(
+      { error: "Failed to update user verification" },
+      { status: 500 }
+    );
   }
 }

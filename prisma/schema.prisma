@@ -22,6 +22,8 @@ model User {
   transactions     Transaction[]
   reservations     Reservation[]
   otpVerifications OtpVerification[]
+  bookRequests     BookRequest[]
+  librarianRequests BookRequest[] @relation("LibrarianRequests")
 }
 
 model Book {
@@ -40,6 +42,7 @@ model Book {
   ebookUrl        String? @db.Text
   transactions    Transaction[]
   reservations    Reservation[]
+  bookRequests    BookRequest[]
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 }
@@ -105,4 +108,27 @@ model OtpVerification {
   expiresAt  DateTime
   consumed   Boolean  @default(false)
   createdAt  DateTime @default(now())
+}
+
+model BookRequest {
+  id          Int              @id @default(autoincrement())
+  userId      Int
+  user        User             @relation(fields: [userId], references: [id])
+  bookId      Int
+  book        Book             @relation(fields: [bookId], references: [id])
+  requestDate DateTime         @default(now())
+  status      BookRequestStatus @default(PENDING)
+  librarianId Int?
+  librarian   User?            @relation("LibrarianRequests", fields: [librarianId], references: [id])
+  processedAt DateTime?
+  notes       String?          @db.Text
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+enum BookRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
 }

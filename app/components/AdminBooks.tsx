@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAlert } from "@/components/ui/custom-alert";
 
 interface Book {
   id: number;
@@ -16,6 +17,7 @@ export function BooksTab() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [deleting, setDeleting] = useState<number | null>(null);
+  const { showAlert, AlertComponent } = useAlert();
 
   const BOOKS_PER_PAGE = 15;
 
@@ -41,16 +43,34 @@ export function BooksTab() {
   };
 
   const handleDelete = async (id: number) => {
-    const shouldDelete = window.confirm(
-      "Are you sure you want to delete this book?"
-    );
-    if (!shouldDelete) return;
+    showAlert({
+      title: "Delete Book",
+      description:
+        "Are you sure you want to delete this book? This action cannot be undone.",
+      type: "warning",
+      showCancel: true,
+      confirmText: "Yes, Delete",
+      cancelText: "Cancel",
+      onConfirm: () => submitDelete(id),
+    });
+  };
+
+  const submitDelete = async (id: number) => {
     setDeleting(id);
     const res = await fetch(`/api/books/${id}`, { method: "DELETE" });
     if (res.ok) {
       setBooks((prev) => prev.filter((book) => book.id !== id));
+      showAlert({
+        title: "Success",
+        description: "Book deleted successfully",
+        type: "success",
+      });
     } else {
-      alert("Error deleting book.");
+      showAlert({
+        title: "Error",
+        description: "Error deleting book.",
+        type: "error",
+      });
     }
     setDeleting(null);
   };
@@ -82,6 +102,7 @@ export function BooksTab() {
 
   return (
     <div className="py-6">
+      <AlertComponent />
       <h2 className="text-2xl font-bold mb-4">Books Management</h2>
       <p className="text-zinc-600">
         Here you can view, add, edit, or remove books from the library.

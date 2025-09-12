@@ -59,7 +59,7 @@ export default function AdminDashboard() {
   else if (activeTab === "AddUser") TabContent = <AddNewUser />;
 
   return (
-    <div className="max-w-5xl mx-auto mt-16 px-6">
+    <div className="max-w-7xl mx-auto mt-16 px-6">
       <div>
         <div className="flex border-b border-zinc-200 mb-6">
           {TABS.map((tab) => (

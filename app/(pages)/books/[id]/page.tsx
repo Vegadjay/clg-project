@@ -1,6 +1,6 @@
 "use client";
 
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -37,12 +37,15 @@ interface Book {
 
 export default function BookPage() {
   const params = useParams();
+  const router = useRouter();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isIssuing, setIsIssuing] = useState(false);
+  const [issueError, setIssueError] = useState<string | null>(null);
+  const [issueSuccess, setIssueSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -65,15 +68,64 @@ export default function BookPage() {
     fetchBook();
   }, [id]);
 
+  // Helper to get user from localStorage (as in login page)
+  const getUserFromLocalStorage = () => {
+    if (typeof window === "undefined") return null;
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    const userData = localStorage.getItem("user");
+    if (isAuthenticated === "true" && userData) {
+      try {
+        return JSON.parse(userData);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
   const handleIssueBook = async () => {
+    setIssueError(null);
+    setIssueSuccess(null);
+
     if (!book || book.availableCopies <= 0) return;
 
+    // Check authentication using localStorage (as in login page)
+    const user = getUserFromLocalStorage();
+
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
     setIsIssuing(true);
+
     try {
-      alert("Book issued successfully! Please collect it from the library.");
-    } catch (error) {
-      console.error("Error issuing book:", error);
-      alert("Failed to issue book. Please try again.");
+      // Make a POST request to /api/book-requests
+      const resp = await fetch("/api/book-requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bookId: book.id,
+          userId: user.id,
+        }),
+      });
+
+      if (!resp.ok) {
+        const errorData = await resp.json().catch(() => ({}));
+        setIssueError(
+          errorData?.message ||
+            "Failed to request book. Please try again or contact support."
+        );
+      router.push("/login");
+      return;
+      } else {
+        setIssueSuccess("Book request submitted successfully!");
+        // Optionally, you could update book.availableCopies here or refetch book data
+      }
+    } catch (err) {
+      setIssueError("Something went wrong. Please try again.");
     } finally {
       setIsIssuing(false);
     }
@@ -145,8 +197,20 @@ export default function BookPage() {
                   {isIssuing ? "Processing..." : "Issue Book"}
                 </Button>
 
+                {issueError && (
+                  <div className="text-red-600 text-sm mt-2 text-center">{issueError}</div>
+                )}
+                {issueSuccess && (
+                  <div className="text-green-600 text-sm mt-2 text-center">{issueSuccess}</div>
+                )}
+
                 {book.ebookUrl && (
-                  <Button variant="outline" className="w-full text-lg py-3" size="lg" asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full text-lg py-3"
+                    size="lg"
+                    asChild
+                  >
                     <a
                       href={book.ebookUrl}
                       target="_blank"
@@ -182,21 +246,27 @@ export default function BookPage() {
                   <User className="h-6 w-6 text-gray-500 mt-1" />
                   <div>
                     <p className="text-base text-gray-600">Author</p>
-                    <p className="font-semibold text-gray-900 text-lg">{book.author}</p>
+                    <p className="font-semibold text-gray-900 text-lg">
+                      {book.author}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Building className="h-6 w-6 text-gray-500 mt-1" />
                   <div>
                     <p className="text-base text-gray-600">Publisher</p>
-                    <p className="font-semibold text-gray-900 text-lg">{book.publisher}</p>
+                    <p className="font-semibold text-gray-900 text-lg">
+                      {book.publisher}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Hash className="h-6 w-6 text-gray-500 mt-1" />
                   <div>
                     <p className="text-base text-gray-600">ISBN</p>
-                    <p className="font-semibold text-gray-900 text-lg">{book.isbn}</p>
+                    <p className="font-semibold text-gray-900 text-lg">
+                      {book.isbn}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -221,7 +291,9 @@ export default function BookPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setShowFullDescription(!showFullDescription)}
+                      onClick={() =>
+                        setShowFullDescription(!showFullDescription)
+                      }
                       className="flex items-center gap-2"
                     >
                       {showFullDescription ? (
@@ -258,7 +330,9 @@ export default function BookPage() {
                   </div>
                   <div>
                     <span className="text-gray-600">Available Copies: </span>
-                    <span className="font-semibold">{book.availableCopies}</span>
+                    <span className="font-semibold">
+                      {book.availableCopies}
+                    </span>
                   </div>
                   <div>
                     <span className="text-gray-600">Borrowed Copies: </span>

@@ -11,7 +11,8 @@ export function middleware(request: NextRequest) {
   if (
     pathname.startsWith("/admin") ||
     pathname.startsWith("/librarian") ||
-    pathname.startsWith("/patron")
+    pathname.startsWith("/patron") ||
+    pathname.startsWith("/request-book")
   ) {
     if (!role) {
       return NextResponse.redirect(new URL("/login", request.url));
@@ -23,6 +24,9 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
     if (pathname.startsWith("/patron") && role !== "PATRON") {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    if (pathname.startsWith("/request-book") && role !== "PATRON") {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
@@ -42,5 +46,11 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/admin/:path*", "/librarian/:path*", "/patron/:path*"],
+  matcher: [
+    "/login",
+    "/admin/:path*",
+    "/librarian/:path*",
+    "/patron/:path*",
+    "/request-book/:path*",
+  ],
 };

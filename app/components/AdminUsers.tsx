@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useAlert } from "@/components/ui/custom-alert";
 
 interface Users {
   id: number;
@@ -17,6 +18,8 @@ export const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [roleFilter, setRoleFilter] = useState<string>("");
   const [search, setSearch] = useState<string>("");
+  const [verifyingUsers, setVerifyingUsers] = useState<Set<number>>(new Set());
+  const { showAlert, AlertComponent } = useAlert();
 
   useEffect(() => {
     fetchUsers();
@@ -32,6 +35,60 @@ export const AdminUsers = () => {
       setUsers([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleUserVerification = async (
+    userId: number,
+    currentStatus: boolean
+  ) => {
+    setVerifyingUsers((prev) => new Set(prev).add(userId));
+
+    try {
+      const response = await fetch("/api/users", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          isVerified: !currentStatus,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Update the user in the local state
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.id === userId ? { ...user, isVerified: !currentStatus } : user
+          )
+        );
+        showAlert({
+          title: "Success",
+          description: result.message,
+          type: "success",
+        });
+      } else {
+        const error = await response.json();
+        showAlert({
+          title: "Error",
+          description: `Error: ${error.error}`,
+          type: "error",
+        });
+      }
+    } catch (error) {
+      showAlert({
+        title: "Error",
+        description: "Failed to update user verification status",
+        type: "error",
+      });
+    } finally {
+      setVerifyingUsers((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
     }
   };
 
@@ -56,6 +113,7 @@ export const AdminUsers = () => {
 
   return (
     <div className="py-6">
+      <AlertComponent />
       <h2 className="text-2xl font-bold mb-4">All Users</h2>
       <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
         <div className="flex items-center gap-2">
@@ -108,6 +166,7 @@ export const AdminUsers = () => {
                 <th className="px-4 py-2 border-b text-left">Library Card #</th>
                 <th className="px-4 py-2 border-b text-left">Verified</th>
                 <th className="px-4 py-2 border-b text-left">Created At</th>
+                <th className="px-4 py-2 border-b text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -133,6 +192,25 @@ export const AdminUsers = () => {
                     {user.createdAt
                       ? new Date(user.createdAt).toLocaleDateString()
                       : ""}
+                  </td>
+                  <td className="px-4 py-2 border-b">
+                    <button
+                      onClick={() =>
+                        toggleUserVerification(user.id, user.isVerified)
+                      }
+                      disabled={verifyingUsers.has(user.id)}
+                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                        user.isVerified
+                          ? "bg-red-100 text-red-700 hover:bg-red-200"
+                          : "bg-green-100 text-green-700 hover:bg-green-200"
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      {verifyingUsers.has(user.id)
+                        ? "Updating..."
+                        : user.isVerified
+                        ? "Unverify"
+                        : "Verify"}
+                    </button>
                   </td>
                 </tr>
               ))}
