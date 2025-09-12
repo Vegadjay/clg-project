@@ -17,9 +17,11 @@ model User {
   address          String?      
   role             Role         @default(PATRON)
   libraryCardNumber String       @unique
+  isVerified       Boolean      @default(false)
   createdAt        DateTime     @default(now())
   transactions     Transaction[]
   reservations     Reservation[]
+  otpVerifications OtpVerification[]
 }
 
 model Book {
@@ -93,4 +95,14 @@ enum ReservationStatus {
   ACTIVE
   FULFILLED
   CANCELLED
+}
+
+model OtpVerification {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  code       String
+  expiresAt  DateTime
+  consumed   Boolean  @default(false)
+  createdAt  DateTime @default(now())
 }

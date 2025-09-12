@@ -69,11 +69,20 @@ export default function BooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<number | null>(null);
+  const [role, setRole] = useState("");
   const router = useRouter();
 
   useEffect(() => {
+    extractRole();
     fetchBooks();
   }, []);
+
+  function extractRole() {
+    const match = document.cookie.match(/(?:^|;\s*)role=([^;]*)/);
+    const role = match ? decodeURIComponent(match[1]) : "";
+    console.log("Match", match, "Role", role);
+    setRole(role);
+  }
 
   const fetchBooks = async () => {
     try {
@@ -133,12 +142,12 @@ export default function BooksPage() {
                 : "No books found in the database"}
             </p>
           </div>
-          {books.length > 0 && (
+          {books.length > 0 && (role === "ADMIN" || role === "LIBRARIAN") && (
             <Button
               onClick={() => router.push("/addbook")}
               variant="primary"
               size="md"
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Add Book</span>
@@ -296,4 +305,7 @@ export default function BooksPage() {
       )}
     </div>
   );
+}
+function jwtDecode(token: string | null) {
+  throw new Error("Function not implemented.");
 }

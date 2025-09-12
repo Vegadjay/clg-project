@@ -1,50 +1,83 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { BooksTab } from "@/app/components/AdminBooks";
+import { AdminUsers } from "@/app/components/AdminUsers";
+import { AddNewUser } from "@/app/components/AddNewUser";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-}
+const TABS = [
+  { key: "books", label: "Books" },
+  { key: "users", label: "Users" },
+  { key: "librarians", label: "Librarians" },
+  { key: "AddUser", label: "Add User" },
+];
 
-interface Book {
-  id: number;
-  title: string;
-  availableCopies: number;
+function LibrariansTab() {
+  return (
+    <div className="py-6">
+      <h2 className="text-2xl font-bold mb-4">Librarians Management</h2>
+      <p className="text-zinc-600">
+        Add or remove librarian accounts and manage their permissions.
+      </p>
+      <div className="mt-4 p-4 bg-zinc-50 border rounded">
+        Librarians table and actions go here.
+      </div>
+    </div>
+  );
 }
 
 export default function AdminDashboard() {
+  const [activeTab, setActiveTab] = useState("books");
   const router = useRouter();
-  const [users, setUsers] = useState<User[]>([]);
-  const [books, setBooks] = useState<Book[]>([]);
 
   useEffect(() => {
-    const role = localStorage.getItem("userRole");
-    if (role !== "admin") router.push("/login");
+    // Check localStorage for authentication
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    const userData = localStorage.getItem("user");
 
-    setUsers(JSON.parse(localStorage.getItem("users") || "[]"));
-    setBooks(JSON.parse(localStorage.getItem("books") || "[]"));
+    if (isAuthenticated !== "true" || !userData) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const user = JSON.parse(userData);
+      if (user.role !== "ADMIN") {
+        router.push("/login");
+        return;
+      }
+    } catch {
+      router.push("/login");
+      return;
+    }
   }, [router]);
+
+  let TabContent;
+  if (activeTab === "books") TabContent = <BooksTab />;
+  else if (activeTab === "users") TabContent = <AdminUsers />;
+  else if (activeTab === "librarians") TabContent = <LibrariansTab />;
+  else if (activeTab === "AddUser") TabContent = <AddNewUser />;
 
   return (
     <div className="max-w-5xl mx-auto mt-16 px-6">
-      <h1 className="text-4xl font-bold mb-8 text-center text-zinc-900">
-        Admin Dashboard
-      </h1>
-      <div className="grid grid-cols-2 gap-10 text-center">
-        <div className="bg-zinc-100  rounded-lg p-8 shadow border border-zinc-200">
-          <p className="text-lg font-semibold text-zinc-600">Total Users</p>
+      <div>
+        <div className="flex border-b border-zinc-200 mb-6">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              className={`px-6 py-3 text-lg font-medium cursor-pointer focus:outline-none transition-colors ${
+                activeTab === tab.key
+                  ? "border-b-4 border-zinc-900 text-zinc-900 bg-zinc-50"
+                  : "text-zinc-500 hover:text-zinc-900"
+              }`}
+              onClick={() => setActiveTab(tab.key)}
+              type="button"
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-        <div className="bg-zinc-100  rounded-lg p-8 shadow border border-zinc-200">
-          <h2 className="text-6xl font-extrabold text-zinc-900">
-            {" "}
-            {books.length}
-          </h2>
-          <p className="text-lg font-semibold text-zinc-600"></p>
-        </div>
+        <div>{TabContent}</div>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 // Seed script to populate dummy categories and books using CommonJS
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcryptjs");
 const fs = require("fs");
 const path = require("path");
 
@@ -14,6 +15,26 @@ async function upsertCategory(name) {
 }
 
 async function main() {
+  // Upsert default admin user
+  const adminEmail = "admin@KitabGhar.lib";
+  const adminPasswordPlain = "admin@123";
+  const adminPasswordHash = await bcrypt.hash(adminPasswordPlain, 10);
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      password: adminPasswordHash,
+      isVerified: true,
+    },
+    create: {
+      name: "Admin",
+      email: adminEmail,
+      password: adminPasswordHash,
+      role: "ADMIN",
+      isVerified: true,
+      libraryCardNumber: "ADMIN-000001",
+    },
+  });
+
   const dataPath = path.join(__dirname, "data", "books.json");
   const raw = fs.readFileSync(dataPath, "utf-8");
   const { categories, books } = JSON.parse(raw);

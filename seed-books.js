@@ -578,13 +578,11 @@ async function upsertCategory(name) {
 async function main() {
   console.log("Starting to seed the database with book data...");
 
-  // Extract unique categories from the book data
   const uniqueCategories = [
     ...new Set(booksData.map((book) => book.category.name)),
   ];
   console.log("Found categories:", uniqueCategories);
 
-  // Create categories first
   const categoryByName = {};
   for (const categoryName of uniqueCategories) {
     console.log(`Creating/updating category: ${categoryName}`);
@@ -592,7 +590,6 @@ async function main() {
     categoryByName[categoryName] = category;
   }
 
-  // Create books
   for (const bookData of booksData) {
     console.log(`Creating/updating book: ${bookData.title}`);
 

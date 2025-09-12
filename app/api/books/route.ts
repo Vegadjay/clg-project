@@ -4,7 +4,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function GET() {
-  // Also include category info for each book
   const books = await prisma.book.findMany({ include: { category: true } });
   return NextResponse.json(books);
 }
@@ -13,7 +12,6 @@ export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
 
-    // Validate description length
     if (data.description && data.description.length > 10000) {
       return NextResponse.json(
         {
@@ -24,7 +22,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate URL lengths
     if (data.imageUrl && data.imageUrl.length > 2000) {
       return NextResponse.json(
         {
@@ -37,6 +34,7 @@ export async function POST(request: NextRequest) {
 
     if (data.ebookUrl && data.ebookUrl.length > 2000) {
       return NextResponse.json(
+        
         {
           error:
             "E-book URL is too long. Please keep it under 2,000 characters.",
@@ -45,12 +43,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Look up the category by name
     let category = await prisma.category.findUnique({
       where: { name: data.category },
     });
 
-    // Create category if it doesn't exist
     if (!category) {
       category = await prisma.category.create({
         data: { name: data.category },

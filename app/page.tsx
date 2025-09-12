@@ -1,30 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import FeaturedBooks from "./(components)/FeaturedBooks";
+import FeaturedBooks from "./components/FeaturedBooks";
+import { LineShadowText } from "@/components/magicui/line-shadow-text";
+import { AnimatedNumber_002 } from "@/components/custom/AnimateNumber";
 
 const page = () => {
   return (
     <main className="min-h-screen bg-background text-foreground transition-colors">
-      {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
-            <div className="inline-flex items-center gap-3 mb-8 px-4 py-2 border border-border rounded-full text-sm text-muted-foreground animate-pulse">
+            <div className="inline-flex items-center gap-3 mb-8 px-4 py-2 border border-border rounded-full text-sm text-muted-foreground">
               <span className="w-2 h-2 bg-primary rounded-full animate-ping"></span>
               Modern Library Management System
             </div>
             <h1 className="text-5xl md:text-7xl font-black mb-8 tracking-tight leading-none animate-fade-in">
-              Revolutionize Your
+              <LineShadowText className="italic">KitabGhar</LineShadowText>
               <br />
               <span className="text-primary font-light italic">
-                Library Experience
+                Your world of books
               </span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in-delay">
-              Streamline operations, enhance user experience, and transform how
-              your community interacts with knowledge through our intelligent
-              library platform.
+              Discover a complete library at your fingertips: seamlessly borrow,
+              buy, sell, or read books online while expanding your knowledge.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delay-2">
               <Link
@@ -33,48 +33,53 @@ const page = () => {
               >
                 Explore Collection
               </Link>
-              <Link
-                href="/register"
-                className="px-10 py-4 rounded-lg border-2 border-border text-foreground font-semibold hover:bg-muted hover:scale-105 transition-all duration-200"
-              >
-                Start Free Trial
-              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
       <section className="py-16 border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="hover:scale-110 transition-transform duration-300">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2 animate-counter">
-                50K+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="flex flex-col items-center justify-center transition-transform duration-300">
+              <div className="flex items-end gap-1 text-4xl md:text-5xl font-bold text-primary mb-2">
+                <AnimatedNumber_002 number={20} />
+                <span className="text-2xl md:text-3xl font-semibold text-primary">
+                  +
+                </span>
               </div>
               <div className="text-sm text-muted-foreground uppercase tracking-wide">
                 Books Managed
               </div>
             </div>
-            <div className="hover:scale-110 transition-transform duration-300">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2 animate-counter">
-                1.2M+
+            <div className="flex flex-col items-center justify-center transition-transform duration-300">
+              <div className="flex items-end gap-1 text-4xl md:text-5xl font-bold text-primary mb-2">
+                <AnimatedNumber_002 number={30} />
+                <span className="text-2xl md:text-3xl font-semibold text-primary">
+                  +
+                </span>
               </div>
               <div className="text-sm text-muted-foreground uppercase tracking-wide">
                 Transactions
               </div>
             </div>
-            <div className="hover:scale-110 transition-transform duration-300">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2 animate-counter">
-                500+
+            <div className="flex flex-col items-center justify-center transition-transform duration-300">
+              <div className="flex items-end gap-1 text-4xl md:text-5xl font-bold text-primary mb-2">
+                <AnimatedNumber_002 number={10} />
+                <span className="text-2xl md:text-3xl font-semibold text-primary">
+                  +
+                </span>
               </div>
               <div className="text-sm text-muted-foreground uppercase tracking-wide">
                 Libraries
               </div>
             </div>
-            <div className="hover:scale-110 transition-transform duration-300">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2 animate-counter">
-                99.9%
+            <div className="flex flex-col items-center justify-center transition-transform duration-300">
+              <div className="flex items-end gap-1 text-4xl md:text-5xl font-bold text-primary mb-2">
+                <AnimatedNumber_002 number={40} />
+                <span className="text-2xl md:text-3xl font-semibold text-primary">
+                  +
+                </span>
               </div>
               <div className="text-sm text-muted-foreground uppercase tracking-wide">
                 Uptime
@@ -309,6 +314,10 @@ const page = () => {
           animation: fade-in 1s ease-out 0.5s both;
         }
       `}</style>
+
+      <footer className="text-center">
+        <a href="/admin/login">admin</a>
+      </footer>
     </main>
   );
 };

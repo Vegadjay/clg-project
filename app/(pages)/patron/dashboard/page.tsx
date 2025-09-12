@@ -14,19 +14,41 @@ export default function PatronDashboard() {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    const role = localStorage.getItem("userRole");
-    if (role !== "patron") router.push("/login");
-    const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
-    const currentUserEmail = localStorage.getItem("userEmail");
-    const currentUser = users.find((u) => u.email === currentUserEmail);
-    setUserName(currentUser?.name || "");
+    let isMounted = true;
+    const checkAuth = () => {
+      // Check localStorage for authentication
+      const isAuthenticated = localStorage.getItem("isAuthenticated");
+      const userData = localStorage.getItem("user");
+
+      if (isAuthenticated !== "true" || !userData) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const user = JSON.parse(userData);
+        if (user.role !== "PATRON") {
+          router.push("/login");
+          return;
+        }
+        if (isMounted)
+          setUserName(user?.name || user?.email?.split("@")[0] || "");
+      } catch {
+        router.push("/login");
+      }
+    };
+    checkAuth();
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
 
   return (
     <div className="max-w-4xl mx-auto mt-16 px-6">
       <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow">
         <h1 className="text-3xl font-bold mb-2 text-zinc-900">
-          Welcome back{userName ? ", " : ""}{userName}!
+          Welcome back{userName ? ", " : ""}
+          {userName}!
         </h1>
         <p className="text-lg text-zinc-700 mb-6">
           Access your borrowed books, reservations, and profile from the menu.

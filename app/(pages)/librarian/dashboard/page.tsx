@@ -14,10 +14,36 @@ export default function LibrarianDashboard() {
   const [books, setBooks] = useState<Book[]>([]);
 
   useEffect(() => {
-    const role = localStorage.getItem("userRole");
-    if (role !== "librarian") router.push("/login");
+    let isMounted = true;
+    const checkAuth = () => {
+      // Check localStorage for authentication
+      const isAuthenticated = localStorage.getItem("isAuthenticated");
+      const userData = localStorage.getItem("user");
 
-    setBooks(JSON.parse(localStorage.getItem("books") || "[]"));
+      if (isAuthenticated !== "true" || !userData) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const user = JSON.parse(userData);
+        if (user.role !== "LIBRARIAN") {
+          router.push("/login");
+          return;
+        }
+      } catch {
+        router.push("/login");
+        return;
+      }
+
+      if (isMounted) {
+        setBooks(JSON.parse(localStorage.getItem("books") || "[]"));
+      }
+    };
+    checkAuth();
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
 
   const availableBooks = books.filter(
@@ -34,17 +60,13 @@ export default function LibrarianDashboard() {
           <h2 className="text-6xl font-extrabold text-zinc-900">
             {availableBooks}
           </h2>
-          <p className="text-lg font-semibold text-zinc-600">
-            Books Available
-          </p>
+          <p className="text-lg font-semibold text-zinc-600">Books Available</p>
         </div>
         <div className="bg-zinc-100 rounded-lg p-8 shadow border border-zinc-200">
           <h2 className="text-6xl font-extrabold text-zinc-900">
             {books.length}
           </h2>
-          <p className="text-lg font-semibold text-zinc-600">
-            Total Books
-          </p>
+          <p className="text-lg font-semibold text-zinc-600">Total Books</p>
         </div>
       </div>
     </div>
