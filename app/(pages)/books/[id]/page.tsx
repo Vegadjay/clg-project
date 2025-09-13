@@ -118,8 +118,8 @@ export default function BookPage() {
           errorData?.message ||
             "Failed to request book. Please try again or contact support."
         );
-      router.push("/login");
-      return;
+        router.push("/login");
+        return;
       } else {
         setIssueSuccess("Book request submitted successfully!");
         // Optionally, you could update book.availableCopies here or refetch book data
@@ -135,7 +135,6 @@ export default function BookPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading book details...</p>
         </div>
       </div>
@@ -151,73 +150,69 @@ export default function BookPage() {
   const shouldTruncate = description.length > 200;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 w-full">
-      <div className="w-full px-0 flex flex-col gap-8">
-        {/* Responsive two-column layout for full width */}
-        <div className="flex flex-col lg:flex-row gap-8 w-full">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Book Image & Actions */}
-          <Card className="flex-1 w-full lg:max-w-[420px] lg:min-w-[340px] self-start">
-            <CardContent className="p-8 flex flex-col items-center">
+          <Card className="w-full lg:w-96">
+            <CardContent className="p-6">
               {book.imageUrl ? (
-                <div className="w-full h-[420px] relative mb-6 flex justify-center items-center">
+                <div className="w-full h-80 mb-4">
                   <img
                     src={book.imageUrl}
                     alt={book.title}
-                    sizes="100vw"
-                    className="object-cover rounded-lg border border-gray-200 w-full h-full max-h-[420px]"
+                    className="w-full h-full object-cover rounded-lg"
                   />
                 </div>
               ) : (
-                <div className="w-full h-[420px] bg-gray-200 rounded-lg flex items-center justify-center mb-6">
-                  <BookOpen className="h-24 w-24 text-gray-400" />
+                <div className="w-full h-80 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
+                  <BookOpen className="h-16 w-16 text-gray-400" />
                 </div>
               )}
 
               {/* Availability Status */}
-              <div className="text-center mb-6 w-full">
+              <div className="text-center mb-4">
                 <Badge
                   variant={isAvailable ? "default" : "destructive"}
-                  className="text-base px-4 py-2"
+                  className="mb-2"
                 >
                   {isAvailable ? "Available" : "Not Available"}
                 </Badge>
-                <p className="text-base text-gray-600 mt-2">
+                <p className="text-sm text-gray-600">
                   {book.availableCopies} of {book.totalCopies} copies available
                 </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="space-y-4 w-full">
+              <div className="space-y-3">
                 <Button
                   onClick={handleIssueBook}
                   disabled={!isAvailable || isIssuing}
-                  className="w-full text-lg py-3"
-                  size="lg"
+                  className="w-full"
                 >
                   {isIssuing ? "Processing..." : "Issue Book"}
                 </Button>
 
                 {issueError && (
-                  <div className="text-red-600 text-sm mt-2 text-center">{issueError}</div>
+                  <div className="text-red-600 text-sm text-center">
+                    {issueError}
+                  </div>
                 )}
                 {issueSuccess && (
-                  <div className="text-green-600 text-sm mt-2 text-center">{issueSuccess}</div>
+                  <div className="text-green-600 text-sm text-center">
+                    {issueSuccess}
+                  </div>
                 )}
 
                 {book.ebookUrl && (
-                  <Button
-                    variant="outline"
-                    className="w-full text-lg py-3"
-                    size="lg"
-                    asChild
-                  >
+                  <Button variant="outline" className="w-full" asChild>
                     <a
                       href={book.ebookUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 justify-center"
                     >
-                      <ExternalLink className="h-5 w-5" />
+                      <ExternalLink className="h-4 w-4" />
                       Read E-book
                     </a>
                   </Button>
@@ -227,53 +222,45 @@ export default function BookPage() {
           </Card>
 
           {/* Book Details */}
-          <Card className="flex-[2] w-full">
+          <Card className="flex-1">
             <CardHeader>
-              <CardTitle className="text-4xl font-bold text-gray-900 mb-4 text-left lg:text-5xl">
+              <CardTitle className="text-3xl font-bold mb-2">
                 {book.title}
               </CardTitle>
-              <div className="flex justify-start">
-                <Badge variant="secondary" className="text-base px-3 py-1">
-                  {book.category?.name || "Uncategorized"}
-                </Badge>
-              </div>
+              <Badge variant="secondary">
+                {book.category?.name || "Uncategorized"}
+              </Badge>
             </CardHeader>
 
-            <CardContent className="space-y-10">
+            <CardContent className="space-y-6">
               {/* Basic Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="flex items-start gap-4">
-                  <User className="h-6 w-6 text-gray-500 mt-1" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-3">
+                  <User className="h-5 w-5 text-gray-500" />
                   <div>
-                    <p className="text-base text-gray-600">Author</p>
-                    <p className="font-semibold text-gray-900 text-lg">
-                      {book.author}
-                    </p>
+                    <p className="text-sm text-gray-600">Author</p>
+                    <p className="font-semibold">{book.author}</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <Building className="h-6 w-6 text-gray-500 mt-1" />
+                <div className="flex items-center gap-3">
+                  <Building className="h-5 w-5 text-gray-500" />
                   <div>
-                    <p className="text-base text-gray-600">Publisher</p>
-                    <p className="font-semibold text-gray-900 text-lg">
-                      {book.publisher}
-                    </p>
+                    <p className="text-sm text-gray-600">Publisher</p>
+                    <p className="font-semibold">{book.publisher}</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <Hash className="h-6 w-6 text-gray-500 mt-1" />
+                <div className="flex items-center gap-3">
+                  <Hash className="h-5 w-5 text-gray-500" />
                   <div>
-                    <p className="text-base text-gray-600">ISBN</p>
-                    <p className="font-semibold text-gray-900 text-lg">
-                      {book.isbn}
-                    </p>
+                    <p className="text-sm text-gray-600">ISBN</p>
+                    <p className="font-semibold">{book.isbn}</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <Calendar className="h-6 w-6 text-gray-500 mt-1" />
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-gray-500" />
                   <div>
-                    <p className="text-base text-gray-600">Publication Date</p>
-                    <p className="font-semibold text-gray-900 text-lg">
+                    <p className="text-sm text-gray-600">Publication Date</p>
+                    <p className="font-semibold">
                       {new Date(book.publicationDate).toLocaleDateString()}
                     </p>
                   </div>
@@ -281,10 +268,10 @@ export default function BookPage() {
               </div>
 
               {/* Description Section */}
-              <div className="border-t pt-8">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
-                  <h3 className="text-2xl font-semibold text-gray-900 flex items-center gap-3">
-                    <FileText className="h-6 w-6" />
+              <div className="border-t pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
                     Description
                   </h3>
                   {shouldTruncate && (
@@ -294,16 +281,16 @@ export default function BookPage() {
                       onClick={() =>
                         setShowFullDescription(!showFullDescription)
                       }
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-1"
                     >
                       {showFullDescription ? (
                         <>
-                          <EyeOff className="h-5 w-5" />
+                          <EyeOff className="h-4 w-4" />
                           Show Less
                         </>
                       ) : (
                         <>
-                          <Eye className="h-5 w-5" />
+                          <Eye className="h-4 w-4" />
                           Show More
                         </>
                       )}
@@ -311,31 +298,31 @@ export default function BookPage() {
                   )}
                 </div>
 
-                <div className="text-gray-700 leading-relaxed text-lg">
+                <div className="text-gray-700 leading-relaxed">
                   {shouldTruncate && !showFullDescription
-                    ? `${description.substring(0, 400)}...`
+                    ? `${description.substring(0, 300)}...`
                     : description}
                 </div>
               </div>
 
               {/* Additional Information */}
-              <div className="border-t pt-8">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+              <div className="border-t pt-4">
+                <h3 className="text-lg font-semibold mb-3">
                   Additional Information
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-base">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Total Copies: </span>
                     <span className="font-semibold">{book.totalCopies}</span>
                   </div>
                   <div>
-                    <span className="text-gray-600">Available Copies: </span>
+                    <span className="text-gray-600">Available: </span>
                     <span className="font-semibold">
                       {book.availableCopies}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-600">Borrowed Copies: </span>
+                    <span className="text-gray-600">Borrowed: </span>
                     <span className="font-semibold">
                       {book.totalCopies - book.availableCopies}
                     </span>

@@ -238,7 +238,7 @@ export default function LibrarianRequestsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-lg border border-zinc-200 p-6">
+        <div className="bg-white rounded-lg border-dashed border-zinc-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-zinc-500">Total Requests</p>
@@ -249,7 +249,7 @@ export default function LibrarianRequestsPage() {
             <AlertCircle className="w-8 h-8 text-zinc-400" />
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-zinc-200 p-6">
+        <div className="bg-white rounded-lg border-dashed border-zinc-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-zinc-500">Pending</p>
@@ -260,7 +260,7 @@ export default function LibrarianRequestsPage() {
             <Clock className="w-8 h-8 text-yellow-400" />
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-zinc-200 p-6">
+        <div className="bg-white rounded-lg border-dashed border-zinc-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-zinc-500">Approved</p>
@@ -271,7 +271,7 @@ export default function LibrarianRequestsPage() {
             <CheckCircle className="w-8 h-8 text-green-400" />
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-zinc-200 p-6">
+        <div className="bg-white rounded-lg border-dashed border-zinc-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-zinc-500">Rejected</p>
@@ -285,7 +285,7 @@ export default function LibrarianRequestsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg border border-zinc-200 p-6 mb-6">
+      <div className="bg-white rounded-lg border-dashed border-zinc-200 p-6 mb-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -334,7 +334,7 @@ export default function LibrarianRequestsPage() {
           {filteredRequests.map((request) => (
             <div
               key={request.id}
-              className="bg-white rounded-xl border border-zinc-200 p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+              className="bg-white rounded-xl border-dashed border-zinc-200 p-6 transition-colors duration-200"
             >
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                 {/* Request Info */}

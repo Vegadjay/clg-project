@@ -1,6 +1,17 @@
 "use client";
 import { useEffect, useState, FormEvent, ChangeEvent } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const categories = [
   "Fiction",
@@ -98,151 +109,146 @@ export default function EditBook() {
 
   if (loading) {
     return (
-      <div className="p-8 text-zinc-700 font-semibold">Loading book...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Loading book...</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto mt-16 p-8 bg-white rounded-lg shadow border border-zinc-200">
-      <h1 className="text-2xl font-bold mb-6 text-center text-zinc-900">
-        Edit Book
-      </h1>
-      <form onSubmit={handleUpdate} className="space-y-6">
-        <input
-          name="title"
-          value={book.title}
-          onChange={handleChange}
-          required
-          type="text"
-          placeholder="Title"
-          className="w-full px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-        />
-        <input
-          name="author"
-          value={book.author}
-          onChange={handleChange}
-          required
-          type="text"
-          placeholder="Author"
-          className="w-full px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-        />
-        <input
-          name="isbn"
-          value={book.isbn}
-          onChange={handleChange}
-          required
-          type="text"
-          placeholder="ISBN"
-          className="w-full px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-        />
-        <select
-          name="category"
-          value={book.category}
-          onChange={handleChange}
-          required
-          className="w-full px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-        >
-          <option value="">Select Category</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-        <input
-          name="publisher"
-          value={book.publisher}
-          onChange={handleChange}
-          required
-          type="text"
-          placeholder="Publisher"
-          className="w-full px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-        />
-        <input
-          type="date"
-          name="publicationDate"
-          value={book.publicationDate}
-          onChange={handleChange}
-          required
-          className="w-full px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-        />
-        <div className="flex gap-4">
-          <input
-            name="totalCopies"
-            value={book.totalCopies}
-            onChange={handleChange}
-            required
-            type="number"
-            min={1}
-            placeholder="Total Copies"
-            className="flex-1 px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-          />
-          <input
-            name="availableCopies"
-            value={book.availableCopies}
-            onChange={handleChange}
-            required
-            type="number"
-            min={0}
-            max={book.totalCopies}
-            placeholder="Available Copies"
-            className="flex-1 px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-          />
-        </div>
-        <input
-          name="imageUrl"
-          value={book.imageUrl}
-          onChange={handleChange}
-          type="url"
-          placeholder="Image URL (optional)"
-          className="w-full px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-        />
-        {/* Preview image if imageUrl is present and valid */}
-        {book.imageUrl && (
-          <div className="flex justify-center mb-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={book.imageUrl}
-              alt="Book cover preview"
-              className="max-h-48 rounded shadow border border-zinc-200"
-              style={{ objectFit: "contain" }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
-            />
-          </div>
-        )}
-        <input
-          name="ebookUrl"
-          value={book.ebookUrl}
-          onChange={handleChange}
-          type="url"
-          placeholder="E-book URL (optional)"
-          className="w-full px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-        />
-        <textarea
-          name="description"
-          value={book.description}
-          onChange={handleChange}
-          placeholder="Description"
-          rows={3}
-          className="w-full px-4 py-2 bg-white text-zinc-900 border border-zinc-300 rounded-md"
-        />
-        {error && (
-          <p className="text-red-600 font-semibold text-center mb-2">{error}</p>
-        )}
-        {success && (
-          <p className="text-green-600 font-semibold text-center mb-2">
-            {success}
-          </p>
-        )}
-        <button
-          type="submit"
-          className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 rounded-md text-zinc-50 font-semibold transition"
-        >
-          Update Book
-        </button>
-      </form>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-2xl mx-auto px-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">
+              Edit Book
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <Input
+                name="title"
+                value={book.title}
+                onChange={handleChange}
+                required
+                placeholder="Title"
+              />
+              <Input
+                name="author"
+                value={book.author}
+                onChange={handleChange}
+                required
+                placeholder="Author"
+              />
+              <Input
+                name="isbn"
+                value={book.isbn}
+                onChange={handleChange}
+                required
+                placeholder="ISBN"
+              />
+              <Select
+                value={book.category}
+                onValueChange={(value) =>
+                  handleChange({ target: { name: "category", value } } as any)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                name="publisher"
+                value={book.publisher}
+                onChange={handleChange}
+                required
+                placeholder="Publisher"
+              />
+              <Input
+                type="date"
+                name="publicationDate"
+                value={book.publicationDate}
+                onChange={handleChange}
+                required
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  name="totalCopies"
+                  value={book.totalCopies}
+                  onChange={handleChange}
+                  required
+                  type="number"
+                  min={1}
+                  placeholder="Total Copies"
+                />
+                <Input
+                  name="availableCopies"
+                  value={book.availableCopies}
+                  onChange={handleChange}
+                  required
+                  type="number"
+                  min={0}
+                  max={book.totalCopies}
+                  placeholder="Available Copies"
+                />
+              </div>
+              <Input
+                name="imageUrl"
+                value={book.imageUrl}
+                onChange={handleChange}
+                type="url"
+                placeholder="Image URL (optional)"
+              />
+              {/* Preview image if imageUrl is present and valid */}
+              {book.imageUrl && (
+                <div className="flex justify-center">
+                  <img
+                    src={book.imageUrl}
+                    alt="Book cover preview"
+                    className="max-h-48 rounded shadow border"
+                    style={{ objectFit: "contain" }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </div>
+              )}
+              <Input
+                name="ebookUrl"
+                value={book.ebookUrl}
+                onChange={handleChange}
+                type="url"
+                placeholder="E-book URL (optional)"
+              />
+              <Textarea
+                name="description"
+                value={book.description}
+                onChange={handleChange}
+                placeholder="Description"
+                rows={3}
+              />
+              {error && (
+                <p className="text-red-600 text-sm text-center">{error}</p>
+              )}
+              {success && (
+                <p className="text-green-600 text-sm text-center">{success}</p>
+              )}
+              <Button type="submit" className="w-full">
+                Update Book
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
